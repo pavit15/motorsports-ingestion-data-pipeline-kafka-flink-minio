@@ -13,16 +13,12 @@ from pyflink.common.typeinfo import Types
 import json
 from datetime import datetime
 
-
-# -------------------------------------------------
-# Schema validation
-# -------------------------------------------------
+# Schema validation 
 REQUIRED_FIELDS = {
     "car_id": int,
     "speed": (int, float),
     "rpm": int,
 }
-
 
 def is_valid(record: dict) -> bool:
     for field, field_type in REQUIRED_FIELDS.items():
@@ -32,10 +28,7 @@ def is_valid(record: dict) -> bool:
             return False
     return True
 
-
-# -------------------------------------------------
-# Pure transformation (NO I/O)
-# -------------------------------------------------
+# Data transformation
 def parse_and_filter(value: str):
     try:
         record = json.loads(value)
@@ -48,23 +41,18 @@ def parse_and_filter(value: str):
         return None
 
 
-# -------------------------------------------------
-# Flink environment
-# -------------------------------------------------
+# Initialising flink environment
 env = StreamExecutionEnvironment.get_execution_environment()
 
 env.enable_checkpointing(10_000)
 env.set_parallelism(1)
 env.set_restart_strategy(RestartStrategies.no_restart())
 
-
-# -------------------------------------------------
-# Kafka source
-# -------------------------------------------------
+# Setting up kafka source
 kafka_source = (
     KafkaSource.builder()
     .set_bootstrap_servers("kafka:9092")
-    .set_topics("telemetry")
+    .set_topics("telemetry_data")
     .set_group_id("flink-telemetry-consumer")
     .set_value_only_deserializer(SimpleStringSchema())
     .build()
@@ -76,10 +64,7 @@ stream = env.from_source(
     "Kafka Telemetry Source",
 )
 
-
-# -------------------------------------------------
-# Transform
-# -------------------------------------------------
+# Data mapping
 valid_stream = (
     stream
     .map(parse_and_filter, output_type=Types.STRING())
@@ -87,9 +72,7 @@ valid_stream = (
 )
 
 
-# -------------------------------------------------
-# S3 / MinIO Sink (PRODUCTION SAFE)
-# -------------------------------------------------
+# Minio s3 data sink
 sink = StreamingFileSink.for_row_format(
     "s3://telemetry-data/telemetry/",
     Encoder.simple_string_encoder("utf-8"),
@@ -104,8 +87,4 @@ sink = StreamingFileSink.for_row_format(
 
 valid_stream.add_sink(sink)
 
-
-# -------------------------------------------------
-# Execute
-# -------------------------------------------------
-env.execute("Motorsports Telemetry Streaming Job")
+env.execute("Motorsports telemetry streaming job")

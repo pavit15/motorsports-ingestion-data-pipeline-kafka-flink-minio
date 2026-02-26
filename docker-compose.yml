@@ -1,9 +1,6 @@
 version: "3.8"
 
 services:
-  # -------------------------------------------------
-  # Zookeeper
-  # -------------------------------------------------
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -13,9 +10,6 @@ services:
     ports:
       - "2181:2181"
 
-  # -------------------------------------------------
-  # Kafka (dual listener: host + docker)
-  # -------------------------------------------------
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
@@ -37,9 +31,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
 
-  # -------------------------------------------------
-  # MinIO (S3-compatible storage)
-  # -------------------------------------------------
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -53,9 +44,6 @@ services:
     volumes:
       - minio-data:/data
 
-  # -------------------------------------------------
-  # MinIO bucket bootstrap
-  # -------------------------------------------------
   minio-init:
     image: minio/mc:latest
     container_name: minio-init
@@ -65,9 +53,6 @@ services:
       - ./minio/init.sh:/init.sh
     entrypoint: ["/bin/sh", "/init.sh"]
 
-  # -------------------------------------------------
-  # Flink JobManager
-  # -------------------------------------------------
   flink-jobmanager:
     build: ./flink
     container_name: flink-jobmanager
@@ -83,9 +68,6 @@ services:
       - ./flink/jobs:/opt/flink/jobs
       - ./flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
 
-  # -------------------------------------------------
-  # Flink TaskManager
-  # -------------------------------------------------
   flink-taskmanager:
     build: ./flink
     container_name: flink-taskmanager
@@ -100,8 +82,5 @@ services:
     volumes:
       - ./flink/flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
 
-# -------------------------------------------------
-# Volumes
-# -------------------------------------------------
 volumes:
   minio-data:

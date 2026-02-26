@@ -17,6 +17,6 @@ while True:
         "timestamp": time.time(),
     }
 
-    producer.send("telemetry", telemetry)
+    producer.send("telemetry_data", telemetry)   
     print("Sent:", telemetry)
     time.sleep(1)

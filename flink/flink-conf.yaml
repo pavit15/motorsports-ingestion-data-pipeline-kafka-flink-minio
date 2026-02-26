@@ -1,14 +1,8 @@
-# -------------------------------------------------
-# REQUIRED: JobManager / TaskManager memory
-# -------------------------------------------------
 jobmanager.memory.process.size: 1024m
 taskmanager.memory.process.size: 1024m
 
 taskmanager.numberOfTaskSlots: 1
 
-# -------------------------------------------------
-# S3 / MinIO (S3A)
-# -------------------------------------------------
 s3.endpoint: http://minio:9000
 s3.access-key: minioadmin
 s3.secret-key: minioadmin
