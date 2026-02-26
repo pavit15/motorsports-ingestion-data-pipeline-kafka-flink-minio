@@ -6,13 +6,7 @@ It simulates live motorsports telemetry (speed, RPM, gear, timestamp), processes
 
 ## Project architecture overview
 
-Producer (Host)
-        
-Kafka (telemetry_data topic)
-        
-Apache Flink (Stream Processing + Windowing)
-        
-MinIO (S3-compatible Object Storage)
+Producer (Host) -> Kafka (telemetry_data topic) -> Apache Flink (Stream Processing + Windowing) -> MinIO (S3-compatible Object Storage)
 
 ## Tech stack used
 Component	| Role
@@ -47,6 +41,8 @@ flink-jobmanager
 
 flink-taskmanager
 
+![Running Containers](img/Running%20containers.jpg)
+
 2️/ Verify MinIO
 
 Open MinIO Console:
@@ -59,6 +55,9 @@ Username: minioadmin
 Password: minioadmin
 ```
 _telemetry-data_ bucket is created automatically via minio-init
+
+![MinIO Bucket](img/Minio%20bucket.jpg)
+![MinIO CLI](img/minio%20cmd%20bucket%20creation.jpg)
 
 3. Create Kafka Topic
 ```
@@ -84,6 +83,8 @@ http://localhost:8081
 
 Ensure job is RUNNING.
 
+![Flink Running](img/Flink%20running.jpg)
+
 5️. Run the data producer 
 ```
 python kafka/telemetry_producer.py
@@ -91,6 +92,7 @@ python kafka/telemetry_producer.py
 You should see:
 
 Sent: { ... }
+![Producer](img/Producer.jpg)
 
 6️. Verify Data in MinIO
 
@@ -105,6 +107,8 @@ telemetry-0-1.json
 _telemetry-..._tmp_...
 
 ⚠ _tmp_ files are in-progress files and are finalized on checkpoint.
+
+![MinIO JSON Files](img/minio%20json%20files.jpg)
 
 # Streaming Logic
 #### 1. Sample Telemetry Event (Kafka topic: telemetry_data)
